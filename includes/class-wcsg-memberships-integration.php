@@ -147,7 +147,7 @@ class WCSG_Memberships_Integration {
 			'product_id' => $args['product_id'],
 		) );
 
-		if ( 1 != count( $subscriptions_in_order ) ) {
+		if ( ! empty( $subscriptions_in_order ) ) {
 
 			$order = wc_get_order( $args['order_id'] );
 
@@ -157,6 +157,10 @@ class WCSG_Memberships_Integration {
 				$recipient_subscription_in_order = array_intersect( array_keys( $subscriptions_in_order ), $recipient_subscriptions );
 
 				$subscription = wcs_get_subscription( reset( $recipient_subscription_in_order ) );
+
+				if ( ! $subscription ) {
+					return;
+				}
 
 				update_post_meta( $args['user_membership_id'], '_subscription_id', $subscription->id );
 				wc_memberships()->get_subscriptions_integration()->update_related_membership_dates( $subscription, 'end', $subscription->get_date( 'end' ) );
