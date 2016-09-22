@@ -119,7 +119,7 @@ class WCSG_Memberships_Integration {
 
 			foreach ( $user_unique_product_ids as $user_access_granting_product_ids ) {
 
-				$user_granting_product = wc_memberships()->allow_cumulative_granting_access_orders()
+				$user_granting_product = wc_memberships_cumulative_granting_access_orders_allowed()
 					? $user_access_granting_product_ids
 					: $user_access_granting_product_ids[0];
 
@@ -151,6 +151,8 @@ class WCSG_Memberships_Integration {
 
 			$order = wc_get_order( $args['order_id'] );
 
+			$wcm_subscriptions_integration_instance = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
+
 			// check if the member user is a recipient
 			if ( $order->user_id != $args['user_id'] ) {
 				$recipient_subscriptions         = WCSG_Recipient_Management::get_recipient_subscriptions( $args['user_id'] );
@@ -163,12 +165,23 @@ class WCSG_Memberships_Integration {
 				}
 
 				update_post_meta( $args['user_membership_id'], '_subscription_id', $subscription->id );
-				wc_memberships()->get_subscriptions_integration()->update_related_membership_dates( $subscription, 'end', $subscription->get_date( 'end' ) );
+
+				// Update the membership end date to align it to the user's subscription
+				if ( $wcm_subscriptions_integration_instance->plan_grants_access_while_subscription_active( $membership_plan->id ) ) {
+
+					$wcm_subscriptions_integration_instance->update_related_membership_dates( $subscription, 'end', $subscription->get_date( 'end' ) );
+				}
+
+			// If the member user is the purchaser, set the linked subscription to their subscription just in case
 			} else {
 				foreach ( $subscriptions_in_order as $subscription ) {
 					if ( ! isset( $subscription->recipient_user ) ) {
 						update_post_meta( $args['user_membership_id'], '_subscription_id', $subscription->id );
-						wc_memberships()->get_subscriptions_integration()->update_related_membership_dates( $subscription, 'end', $subscription->get_date( 'end' ) );
+
+						if ( $wcm_subscriptions_integration_instance->plan_grants_access_while_subscription_active( $membership_plan->id ) ) {
+
+							$wcm_subscriptions_integration_instance->update_related_membership_dates( $subscription, 'end', $subscription->get_date( 'end' ) );
+						}
 					}
 				}
 			}
