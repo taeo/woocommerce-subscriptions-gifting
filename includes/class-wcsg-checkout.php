@@ -18,6 +18,8 @@ class WCSG_Checkout {
 		add_filter( 'woocommerce_checkout_get_value', __CLASS__ . '::maybe_get_recipient_shipping', 10, 2 );
 
 		add_action( 'woocommerce_checkout_update_order_review', __CLASS__ . '::store_recipients_in_session', 10, 1 );
+
+		add_action( 'woocommerce_before_checkout_shipping_form', __CLASS__ . '::maybe_display_recipient_shipping_notice', 10 );
 	}
 
 	/**
@@ -119,19 +121,12 @@ class WCSG_Checkout {
 	 * If the cart contains a gifted subscription renewal tell the checkout to ship to a different address.
 	 *
 	 * @param bool $ship_to_different_address Whether the order will ship to a different address
-	 *
 	 * @return bool $ship_to_different_address
 	 */
 	public static function maybe_ship_to_recipient( $ship_to_different_address ) {
 
-		if ( wcs_cart_contains_renewal() ) {
-			$item         = wcs_cart_contains_renewal();
-			$subscription = wcs_get_subscription( $item['subscription_renewal']['subscription_id'] );
-
-			if ( isset( $subscription->recipient_user ) ) {
-				wc_print_notice( esc_html__( 'Shipping to the subscription recipient.', 'woocommerce-subscriptions-gifting' ), 'notice' );
-				$ship_to_different_address = true;
-			}
+		if ( ! $ship_to_different_address && WCSG_Cart::contains_gifted_renewal() ) {
+			$ship_to_different_address = true;
 		}
 
 		return $ship_to_different_address;
@@ -147,15 +142,13 @@ class WCSG_Checkout {
 	public static function maybe_get_recipient_shipping( $value, $key ) {
 		$shipping_fields = WC()->countries->get_address_fields( '', 'shipping_' );
 
-		if ( wcs_cart_contains_renewal() && array_key_exists( $key, $shipping_fields ) ) {
+		if ( array_key_exists( $key, $shipping_fields ) && WCSG_Cart::contains_gifted_renewal() ) {
 
 			$item         = wcs_cart_contains_renewal();
 			$subscription = wcs_get_subscription( $item['subscription_renewal']['subscription_id'] );
-
-			if ( isset( $subscription->recipient_user ) ) {
-				return get_user_meta( $subscription->recipient_user, $key, true );
-			}
+			$value        = get_user_meta( $subscription->recipient_user, $key, true );
 		}
+
 		return $value;
 	}
 
@@ -171,6 +164,18 @@ class WCSG_Checkout {
 
 		if ( isset( $checkout_data['recipient_email'] ) ) {
 			WC()->session->set( 'wcsg_recipients', $checkout_data['recipient_email'] );
+		}
+	}
+
+	/**
+	 * If the cart contains a gifted subscription renewal, output a "Shipping to recipient" notice
+	 *
+	 * @since 1.0.1
+	 */
+	public static function maybe_display_recipient_shipping_notice() {
+
+		if ( WCSG_Cart::contains_gifted_renewal() ) {
+			wc_print_notice( esc_html__( 'Shipping to the subscription recipient.', 'woocommerce-subscriptions-gifting' ), 'notice' );
 		}
 	}
 }

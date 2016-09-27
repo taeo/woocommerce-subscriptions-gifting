@@ -183,5 +183,22 @@ class WCSG_Cart {
 
 		return $cart_item_data;
 	}
+
+	/**
+	 * Checks the cart to see if it contains a gifted subscription renewal.
+	 *
+	 * @return bool
+	 * @since 1.0.1
+	 */
+	public static function contains_gifted_renewal() {
+		$cart_contains_gifted_renewal = false;
+
+		if ( $item = wcs_cart_contains_renewal() ) {
+
+			$cart_contains_gifted_renewal = WCS_Gifting::is_gifted_subscription( $item['subscription_renewal']['subscription_id'] );
+		}
+
+		return $cart_contains_gifted_renewal;
+	}
 }
 WCSG_Cart::init();
