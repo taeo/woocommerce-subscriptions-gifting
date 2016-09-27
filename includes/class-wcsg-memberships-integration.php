@@ -119,7 +119,7 @@ class WCSG_Memberships_Integration {
 
 			foreach ( $user_unique_product_ids as $user_access_granting_product_ids ) {
 
-				$user_granting_product = wc_memberships_cumulative_granting_access_orders_allowed()
+				$user_granting_product = ( 'yes' === get_option( 'wc_memberships_allow_cumulative_access_granting_orders', 'no' ) )
 					? $user_access_granting_product_ids
 					: $user_access_granting_product_ids[0];
 
@@ -151,7 +151,10 @@ class WCSG_Memberships_Integration {
 
 			$order = wc_get_order( $args['order_id'] );
 
-			$wcm_subscriptions_integration_instance = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
+			// Get the WC Memberships Subscription integration instance
+			$wcm_subscriptions_integration_instance = is_callable( array( wc_memberships(), 'get_integrations_instance' ) )
+				? wc_memberships()->get_integrations_instance()->get_subscriptions_instance()
+				: wc_memberships()->get_subscriptions_integration();
 
 			// check if the member user is a recipient
 			if ( $order->user_id != $args['user_id'] ) {
