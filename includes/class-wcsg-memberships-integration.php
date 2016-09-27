@@ -170,26 +170,18 @@ class WCSG_Memberships_Integration {
 				update_post_meta( $args['user_membership_id'], '_subscription_id', $subscription->id );
 
 				// Update the membership end date to align it to the user's subscription
-				if ( $wcm_subscriptions_integration_instance->plan_grants_access_while_subscription_active( $membership_plan->id ) ) {
-
-					$wcm_subscriptions_integration_instance->update_related_membership_dates( $subscription, 'end', $subscription->get_date( 'end' ) );
-				}
+				$wcm_subscriptions_integration_instance->update_related_membership_dates( $subscription, 'end', $subscription->get_date( 'end' ) );
 
 			// If the member user is the purchaser, set the linked subscription to their subscription just in case
 			} else {
 				foreach ( $subscriptions_in_order as $subscription ) {
 					if ( ! isset( $subscription->recipient_user ) ) {
 						update_post_meta( $args['user_membership_id'], '_subscription_id', $subscription->id );
-
-						if ( $wcm_subscriptions_integration_instance->plan_grants_access_while_subscription_active( $membership_plan->id ) ) {
-
-							$wcm_subscriptions_integration_instance->update_related_membership_dates( $subscription, 'end', $subscription->get_date( 'end' ) );
-						}
+						$wcm_subscriptions_integration_instance->update_related_membership_dates( $subscription, 'end', $subscription->get_date( 'end' ) );
 					}
 				}
 			}
 		}
 	}
-
 }
 WCSG_Memberships_Integration::init();
