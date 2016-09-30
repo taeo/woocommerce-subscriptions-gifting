@@ -185,7 +185,7 @@ class WCSG_Cart {
 	 * Checks the cart to see if it contains a gifted subscription renewal.
 	 *
 	 * @return bool
-	 * @since 1.0.1
+	 * @since 1.0
 	 */
 	public static function contains_gifted_renewal() {
 		$cart_contains_gifted_renewal = false;
