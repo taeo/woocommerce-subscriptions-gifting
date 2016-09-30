@@ -170,7 +170,7 @@ class WCSG_Checkout {
 	/**
 	 * If the cart contains a gifted subscription renewal, output a "Shipping to recipient" notice
 	 *
-	 * @since 1.0.1
+	 * @since 1.0
 	 */
 	public static function maybe_display_recipient_shipping_notice() {
 
