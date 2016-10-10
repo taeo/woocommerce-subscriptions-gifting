@@ -55,7 +55,7 @@ install_wp() {
 	tar --strip-components=1 -zxmf /tmp/wordpress.tar.gz -C "$WP_CORE_DIR"
 
 	# get a test db config
-	curl https://raw.github.com/markoheijnen/wp-mysqli/master/db.php?access_token=$GITHUB_TOKEN --output "$WP_CORE_DIR/wp-content/db.php" --silent
+	curl https://raw.github.com/markoheijnen/wp-mysqli/master/db.php --output "${WP_CORE_DIR}/wp-content/db.php" --silent
 
 	say "WordPress Installed"
 
@@ -101,7 +101,7 @@ install_cs() {
 	mkdir -p "php-codesniffer"
 
 	# uncompress codesniffer into the directory we created
-	curl -L https://api.github.com/repos/squizlabs/PHP_CodeSniffer/tarball/2.3.3?access_token=$GITHUB_TOKEN --silent | tar --strip-components=1 -zx -C "php-codesniffer"
+	curl -L https://api.github.com/repos/squizlabs/PHP_CodeSniffer/tarball/2.3.3 --silent | tar --strip-components=1 -zx -C "php-codesniffer"
 
 	say "PHP_CodeSniffer Installed"
 
@@ -109,13 +109,13 @@ install_cs() {
 	mkdir -p "wordpress-coding-standards"
 
 	# uncompress the coding standards into the directory we created
-	curl -L https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/tarball/0.6.0?access_token=$GITHUB_TOKEN --silent | tar --strip-components=1 -zx -C "wordpress-coding-standards"
+	curl -L https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/tarball/0.6.0 --silent | tar --strip-components=1 -zx -C "wordpress-coding-standards"
 
 	# make a directory for the Prospress coding standard rules
 	mkdir -p "prospress-coding-standards"
 
 	# uncompress the coding standards into the directory we created
-	curl -L https://api.github.com/repos/Prospress/prospress-coding-standards/tarball/master?access_token=$GITHUB_TOKEN --silent | tar --strip-components=1 -zx -C "prospress-coding-standards"
+	curl -L https://api.github.com/repos/Prospress/prospress-coding-standards/tarball/master --silent | tar --strip-components=1 -zx -C "prospress-coding-standards"
 
 	# move in the codesniffer directory
 	cd php-codesniffer
